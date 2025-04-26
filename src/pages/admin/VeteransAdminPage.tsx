@@ -74,7 +74,7 @@ export const VeteransAdminPage: React.FC = () => {
     }, [veterans, searchQuery, rankFilter, unitFilter]);
     
     // Удаление ветерана
-    const handleDeleteVeteran = async (id: number) => {
+    const handleDeleteVeteran = async (id: string) => {
         try {
             await deleteVeteran(id);
             

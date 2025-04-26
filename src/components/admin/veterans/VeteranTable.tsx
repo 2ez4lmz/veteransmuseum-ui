@@ -5,7 +5,7 @@ import { DeleteConfirmationModal } from '../../common/DeleteConfirmationModal';
 
 interface VeteranTableProps {
     veterans: Veteran[];
-    onDeleteVeteran: (id: number) => void;
+    onDeleteVeteran: (id: string) => void;
 }
 
 export const VeteranTable: React.FC<VeteranTableProps> = ({ veterans, onDeleteVeteran }) => {
@@ -196,4 +196,4 @@ export const VeteranTable: React.FC<VeteranTableProps> = ({ veterans, onDeleteVe
             />
         </>
     );
-}; 
+};

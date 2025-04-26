@@ -92,8 +92,9 @@ export const AddVeteranPage: React.FC = () => {
             // Преобразуем данные в формат API
             const veteranData = {
                 ...formData,
-                birthDate: formData.birthDate || undefined,
-                deathDate: formData.deathDate || undefined,
+                // Преобразуем локальные даты в UTC
+                birthDate: formData.birthDate ? new Date(formData.birthDate).toISOString() : undefined,
+                deathDate: formData.deathDate ? new Date(formData.deathDate).toISOString() : undefined,
                 imageUrl: formData.imageUrl || undefined
             };
             

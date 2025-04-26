@@ -67,7 +67,7 @@ export const createVeteran = async (veteranData: {
 };
 
 // Функция для обновления данных ветерана
-export const updateVeteran = async (id: number, veteranData: {
+export const updateVeteran = async (id: string, veteranData: {
     firstName: string;
     lastName: string;
     middleName: string;
@@ -85,8 +85,8 @@ export const updateVeteran = async (id: number, veteranData: {
     const response = await fetch(`${API_URL}/veterans/${id}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Content-Type': 'application/json'
+            //'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(veteranData)
     });
@@ -96,11 +96,18 @@ export const updateVeteran = async (id: number, veteranData: {
         throw new Error(errorData?.message || 'Ошибка при обновлении данных ветерана');
     }
     
-    return response.json();
+    // Проверяем заголовок Content-Type и длину ответа
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json') && response.headers.get('content-length') !== '0') {
+        return response.json();
+    } else {
+        // Если сервер не возвращает JSON, возвращаем успешный статус
+        return { success: true };
+    }
 };
 
 // Функция для удаления ветерана
-export const deleteVeteran = async (id: number) => {
+export const deleteVeteran = async (id: string) => {
     const token = localStorage.getItem('token');
     
     const response = await fetch(`${API_URL}/veterans/${id}`, {
@@ -165,7 +172,14 @@ export const updateNews = async (id: string, newsData: {
         throw new Error(errorData?.message || 'Ошибка при обновлении новости');
     }
     
-    return response.json();
+    // Проверяем заголовок Content-Type и длину ответа
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json') && response.headers.get('content-length') !== '0') {
+        return response.json();
+    } else {
+        // Если сервер не возвращает JSON, возвращаем успешный статус
+        return { success: true };
+    }
 };
 
 // Функция для удаления новости

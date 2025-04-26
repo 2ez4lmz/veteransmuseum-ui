@@ -47,7 +47,7 @@ export const VeteranFilters: React.FC<VeteranFiltersProps> = ({
                         <input
                             type="text"
                             id="search"
-                            className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md"
+                            className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800"
                             placeholder="Поиск по имени или фамилии"
                             value={query}
                             onChange={handleSearchChange}
@@ -87,4 +87,4 @@ export const VeteranFilters: React.FC<VeteranFiltersProps> = ({
             </div>
         </div>
     );
-}; 
+};

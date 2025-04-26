@@ -149,6 +149,7 @@ export const VeteransPage = () => {
                         onSearch={handleSearch}
                         onFilterChange={handleFilterChange}
                         filters={filters}
+                        ranks={Array.from(new Set(veterans.map(v => v.rank))).sort()}
                     />
 
                     {filteredVeterans.length === 0 ? (

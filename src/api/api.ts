@@ -1,5 +1,7 @@
 const API_URL = 'https://localhost:8001/api';
 
+import { authUtils } from '../utils/auth';
+
 export const fetchAllNews = async () => {
     const response = await fetch(`${API_URL}/news`);
     if (!response.ok) {
@@ -47,14 +49,14 @@ export const createVeteran = async (veteranData: {
     battles: string;
     imageUrl?: string;
 }) => {
-    const token = localStorage.getItem('token'); // Предполагаем, что токен хранится в localStorage
+    const headers = {
+        'Content-Type': 'application/json',
+        ...authUtils.getAuthHeader()
+    };
     
     const response = await fetch(`${API_URL}/veterans`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-            // 'Authorization': `Bearer ${token}`
-        },
+        headers,
         body: JSON.stringify(veteranData)
     });
     
@@ -80,14 +82,14 @@ export const updateVeteran = async (id: string, veteranData: {
     battles: string;
     imageUrl?: string;
 }) => {
-    const token = localStorage.getItem('token');
+    const headers = {
+        'Content-Type': 'application/json',
+        ...authUtils.getAuthHeader()
+    };
     
     const response = await fetch(`${API_URL}/veterans/${id}`, {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-            //'Authorization': `Bearer ${token}`
-        },
+        headers,
         body: JSON.stringify(veteranData)
     });
     
@@ -108,12 +110,10 @@ export const updateVeteran = async (id: string, veteranData: {
 
 // Функция для удаления ветерана
 export const deleteVeteran = async (id: string) => {
-    const token = localStorage.getItem('token');
-    
     const response = await fetch(`${API_URL}/veterans/${id}`, {
         method: 'DELETE',
         headers: {
-            'Authorization': `Bearer ${token}`
+            ...authUtils.getAuthHeader()
         }
     });
     
@@ -131,14 +131,14 @@ export const createNews = async (newsData: {
     content: string;
     imageUrl?: string;
 }) => {
-    const token = localStorage.getItem('token');
+    const headers = {
+        'Content-Type': 'application/json',
+        ...authUtils.getAuthHeader()
+    };
     
     const response = await fetch(`${API_URL}/news`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
+        headers,
         body: JSON.stringify(newsData)
     });
     
@@ -156,14 +156,14 @@ export const updateNews = async (id: string, newsData: {
     content: string;
     imageUrl?: string;
 }) => {
-    const token = localStorage.getItem('token');
+    const headers = {
+        'Content-Type': 'application/json',
+        ...authUtils.getAuthHeader()
+    };
     
     const response = await fetch(`${API_URL}/news/${id}`, {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
+        headers,
         body: JSON.stringify(newsData)
     });
     
@@ -184,12 +184,10 @@ export const updateNews = async (id: string, newsData: {
 
 // Функция для удаления новости
 export const deleteNews = async (id: string) => {
-    const token = localStorage.getItem('token');
-    
     const response = await fetch(`${API_URL}/news/${id}`, {
         method: 'DELETE',
         headers: {
-            'Authorization': `Bearer ${token}`
+            ...authUtils.getAuthHeader()
         }
     });
     
@@ -199,4 +197,43 @@ export const deleteNews = async (id: string) => {
     }
     
     return true;
+};
+
+// Функция для аутентификации пользователя
+export const loginUser = async (credentials: { email: string; password: string }) => {
+    const response = await fetch(`${API_URL}/users/login`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(credentials)
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || 'Ошибка при входе в систему');
+    }
+    
+    return response.json();
+};
+
+// Функция для получения данных текущего пользователя
+export const getCurrentUser = async () => {
+    const response = await fetch(`${API_URL}/users/me`, {
+        headers: {
+            ...authUtils.getAuthHeader()
+        }
+    });
+    
+    if (!response.ok) {
+        throw new Error('Ошибка при получении данных пользователя');
+    }
+    
+    return response.json();
+};
+
+// Функция для выхода из системы (только на клиенте)
+export const logoutUser = () => {
+    authUtils.removeToken();
+    window.location.href = '/admin/login';
 };

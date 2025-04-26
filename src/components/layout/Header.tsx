@@ -21,6 +21,9 @@ export const Header = () => {
                         <Link to="/veterans" className="hover:text-gray-300 transition-colors">
                             Ветераны
                         </Link>
+                        <Link to="/admin/login" className="text-gray-400 hover:text-gray-300 text-sm transition-colors">
+                            Вход для администраторов
+                        </Link>
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -53,9 +56,16 @@ export const Header = () => {
                         >
                             Ветераны
                         </Link>
+                        <Link 
+                            to="/admin/login" 
+                            className="block py-2 text-gray-400 hover:text-gray-300 text-sm transition-colors"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            Вход для администраторов
+                        </Link>
                     </div>
                 )}
             </nav>
         </header>
     );
-}; 
+};

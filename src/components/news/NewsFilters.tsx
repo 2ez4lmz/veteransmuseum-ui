@@ -25,7 +25,7 @@ export const NewsFilters: FC<NewsFiltersProps> = ({
                         type="text"
                         placeholder="Поиск по заголовку или содержанию..."
                         onChange={(e) => onSearch(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800"
                     />
                 </div>
 
@@ -39,7 +39,7 @@ export const NewsFilters: FC<NewsFiltersProps> = ({
                                 type="date"
                                 value={filters.dateFrom}
                                 onChange={(e) => onFilterChange('dateFrom', e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800"
                             />
                         </div>
                         <div className="relative">
@@ -47,7 +47,7 @@ export const NewsFilters: FC<NewsFiltersProps> = ({
                                 type="date"
                                 value={filters.dateTo}
                                 onChange={(e) => onFilterChange('dateTo', e.target.value)}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800"
                             />
                         </div>
                     </div>
@@ -55,4 +55,4 @@ export const NewsFilters: FC<NewsFiltersProps> = ({
             </div>
         </div>
     );
-}; 
+};

@@ -16,7 +16,7 @@ export const NewsCard = ({ news }: NewsCardProps) => {
                 />
             </div>
             <div className="p-4 md:p-6 flex-grow flex flex-col">
-                <h3 className="text-lg md:text-xl font-bold mb-2 line-clamp-2">{news.title}</h3>
+                <h3 className="text-lg md:text-xl font-bold mb-2 line-clamp-2 text-gray-900">{news.title}</h3>
                 <p className="text-gray-600 mb-4 line-clamp-3 flex-grow">{news.content}</p>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm text-gray-500 gap-2">
                     <span>{news.author}</span>
@@ -31,4 +31,4 @@ export const NewsCard = ({ news }: NewsCardProps) => {
             </div>
         </div>
     );
-}; 
+};

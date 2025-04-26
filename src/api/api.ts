@@ -117,3 +117,72 @@ export const deleteVeteran = async (id: number) => {
     
     return true;
 };
+
+// Функция для создания новой новости
+export const createNews = async (newsData: {
+    title: string;
+    content: string;
+    imageUrl?: string;
+}) => {
+    const token = localStorage.getItem('token');
+    
+    const response = await fetch(`${API_URL}/news`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newsData)
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || 'Ошибка при создании новости');
+    }
+    
+    return response.json();
+};
+
+// Функция для обновления новости
+export const updateNews = async (id: string, newsData: {
+    title: string;
+    content: string;
+    imageUrl?: string;
+}) => {
+    const token = localStorage.getItem('token');
+    
+    const response = await fetch(`${API_URL}/news/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newsData)
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || 'Ошибка при обновлении новости');
+    }
+    
+    return response.json();
+};
+
+// Функция для удаления новости
+export const deleteNews = async (id: string) => {
+    const token = localStorage.getItem('token');
+    
+    const response = await fetch(`${API_URL}/news/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || 'Ошибка при удалении новости');
+    }
+    
+    return true;
+};

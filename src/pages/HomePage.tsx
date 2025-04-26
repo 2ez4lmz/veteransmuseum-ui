@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { NewsCard } from '../components/news/NewsCard';
 import { VeteranCard } from '../components/veterans/VeteranCard';
 import { Link } from 'react-router-dom';
+import { Veteran, VeteranResponse } from '../types/veteran';
 
 // Временные данные для демонстрации
 const mockNews = [
@@ -24,24 +26,51 @@ const mockNews = [
     }
 ];
 
-const mockVeterans = [
-    {
-        id: 1,
-        firstName: 'Иван',
-        lastName: 'Иванов',
-        middleName: 'Иванович',
-        birthDate: '1920-05-15',
-        deathDate: '2005-03-20',
-        rank: 'Полковник',
-        awards: ['Орден Красной Звезды', 'Медаль "За отвагу"'],
-        biography: 'Участник Великой Отечественной войны, прошел путь от рядового до полковника...',
-        militaryUnit: '123-я стрелковая дивизия',
-        battles: ['Сталинградская битва', 'Курская битва'],
-        imageUrl: undefined
-    }
-];
-
 export const HomePage = () => {
+    const [veterans, setVeterans] = useState<Veteran[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // Получение данных ветеранов с API
+    useEffect(() => {
+        const fetchVeterans = async () => {
+            try {
+                setLoading(true);
+                const response = await fetch('https://localhost:8001/api/veterans');
+                if (!response.ok) {
+                    throw new Error('Ошибка при загрузке списка ветеранов');
+                }
+                const data: VeteranResponse[] = await response.json();
+
+                // Преобразуем данные в формат Veteran
+                const transformedVeterans: Veteran[] = data.map(veteran => ({
+                    id: veteran.id,
+                    firstName: veteran.firstName,
+                    lastName: veteran.lastName,
+                    middleName: veteran.middleName,
+                    birthDate: veteran.birthDate || '',
+                    deathDate: veteran.deathDate || undefined,
+                    rank: veteran.rank,
+                    awards: veteran.awards ? veteran.awards.split(',').map(item => item.trim()) : [],
+                    biography: veteran.biography,
+                    militaryUnit: veteran.militaryUnit,
+                    battles: veteran.battles ? veteran.battles.split(',').map(item => item.trim()) : [],
+                    imageUrl: veteran.imageUrl || undefined,
+                }));
+
+                // Отображаем только 5 ветеранов на главной странице
+                setVeterans(transformedVeterans.slice(0, 5));
+            } catch (err) {
+                setError('Произошла ошибка при загрузке данных');
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchVeterans();
+    }, []);
+
     return (
         <div className="min-h-screen flex flex-col bg-gray-50 w-full">
             <Header />
@@ -92,11 +121,26 @@ export const HomePage = () => {
                                 </svg>
                             </Link>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 md:gap-8">
-                            {mockVeterans.map(veteran => (
-                                <VeteranCard key={veteran.id} veteran={veteran} />
-                            ))}
-                        </div>
+                        
+                        {loading ? (
+                            <div className="flex justify-center py-12">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                            </div>
+                        ) : error ? (
+                            <div className="text-center py-8">
+                                <p className="text-red-600">{error}</p>
+                            </div>
+                        ) : veterans.length === 0 ? (
+                            <div className="text-center py-8">
+                                <p className="text-gray-500">Ветераны не найдены</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 md:gap-8">
+                                {veterans.map(veteran => (
+                                    <VeteranCard key={veteran.id} veteran={veteran} />
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </section>
 
@@ -128,4 +172,4 @@ export const HomePage = () => {
             <Footer />
         </div>
     );
-}; 
+};

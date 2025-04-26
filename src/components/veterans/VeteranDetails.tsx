@@ -7,12 +7,16 @@ interface VeteranDetailsProps {
 }
 
 export const VeteranDetails: FC<VeteranDetailsProps> = ({ veteran }) => {
-    const formatDate = (date: string) => {
-        return new Date(date).toLocaleDateString('ru-RU', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+    const formatDate = (date: string | null | undefined) => {
+        if (!date) return 'Не указано';
+        const parsedDate = new Date(date);
+        return isNaN(parsedDate.getTime())
+            ? 'Некорректная дата'
+            : parsedDate.toLocaleDateString('ru-RU', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+              });
     };
 
     return (

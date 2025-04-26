@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { VeteranDetails } from '../components/veterans/VeteranDetails';
-import { Veteran } from '../types/veteran';
+import { Veteran, VeteranResponse } from '../types/veteran';
 
 export const VeteranDetailsPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -15,22 +15,29 @@ export const VeteranDetailsPage = () => {
         const fetchVeteran = async () => {
             try {
                 setLoading(true);
-                // В будущем заменить на реальный API-запрос
-                const mockVeteran: Veteran = {
-                    id: Number(id),
-                    firstName: 'Иван',
-                    lastName: 'Иванов',
-                    middleName: 'Иванович',
-                    birthDate: '1920-05-15',
-                    deathDate: '2005-03-20',
-                    rank: 'Полковник',
-                    awards: ['Орден Красной Звезды', 'Медаль "За отвагу"'],
-                    biography: 'Участник Великой Отечественной войны, прошел путь от рядового до полковника. Отличился в боях под Сталинградом, где командовал ротой. После войны продолжил службу в вооруженных силах, занимая различные командные должности. Награжден многочисленными орденами и медалями за боевые заслуги и безупречную службу.',
-                    militaryUnit: '123-я стрелковая дивизия',
-                    battles: ['Сталинградская битва', 'Курская битва', 'Берлинская операция'],
-                    imageUrl: undefined
+                const response = await fetch(`https://localhost:8001/api/veterans/${id}`);
+                if (!response.ok) {
+                    throw new Error('Ошибка при загрузке данных ветерана');
+                }
+                const data: VeteranResponse = await response.json();
+        
+                // Преобразуем данные в формат Veteran
+                const transformedVeteran: Veteran = {
+                    id: data.id,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    middleName: data.middleName,
+                    birthDate: data.birthDate || '', // Преобразуем null в пустую строку
+                    deathDate: data.deathDate || undefined,
+                    rank: data.rank,
+                    awards: data.awards ? data.awards.split(',').map(item => item.trim()) : [], // Разделяем строку на массив
+                    biography: data.biography,
+                    militaryUnit: data.militaryUnit,
+                    battles: data.battles ? data.battles.split(',').map(item => item.trim()) : [], // Разделяем строку на массив
+                    imageUrl: data.imageUrl || undefined,
                 };
-                setVeteran(mockVeteran);
+        
+                setVeteran(transformedVeteran);
             } catch (err) {
                 setError('Произошла ошибка при загрузке данных ветерана');
                 console.error(err);
@@ -96,4 +103,4 @@ export const VeteranDetailsPage = () => {
             <Footer />
         </div>
     );
-}; 
+};

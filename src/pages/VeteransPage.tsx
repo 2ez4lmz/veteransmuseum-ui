@@ -4,7 +4,7 @@ import { Footer } from '../components/layout/Footer';
 import { VeteranCard } from '../components/veterans/VeteranCard';
 import { VeteransFilters } from '../components/veterans/VeteransFilters';
 import { Pagination } from '../components/common/Pagination';
-import { Veteran } from '../types/veteran';
+import { Veteran, VeteranResponse } from '../types/veteran';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -17,28 +17,47 @@ export const VeteransPage = () => {
         militaryUnit: ''
     });
     const [searchQuery, setSearchQuery] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    // Моковые данные (в будущем заменить на API)
+    // Получение данных с API
     useEffect(() => {
-        const mockVeterans: Veteran[] = [
-            {
-                id: 1,
-                firstName: 'Иван',
-                lastName: 'Иванов',
-                middleName: 'Иванович',
-                birthDate: '1920-05-15',
-                deathDate: '2005-03-20',
-                rank: 'Полковник',
-                awards: ['Орден Красной Звезды', 'Медаль "За отвагу"'],
-                biography: 'Участник Великой Отечественной войны, прошел путь от рядового до полковника...',
-                militaryUnit: '123-я стрелковая дивизия',
-                battles: ['Сталинградская битва', 'Курская битва'],
-                imageUrl: undefined
-            },
-            // Добавьте больше моковых данных по необходимости
-        ];
-        setVeterans(mockVeterans);
-        setFilteredVeterans(mockVeterans);
+        const fetchVeterans = async () => {
+            try {
+                setLoading(true);
+                const response = await fetch('https://localhost:8001/api/veterans');
+                if (!response.ok) {
+                    throw new Error('Ошибка при загрузке списка ветеранов');
+                }
+                const data: VeteranResponse[] = await response.json();
+
+                // Преобразуем данные в формат Veteran
+                const transformedVeterans: Veteran[] = data.map(veteran => ({
+                    id: veteran.id,
+                    firstName: veteran.firstName,
+                    lastName: veteran.lastName,
+                    middleName: veteran.middleName,
+                    birthDate: veteran.birthDate || '',
+                    deathDate: veteran.deathDate || undefined,
+                    rank: veteran.rank,
+                    awards: veteran.awards ? veteran.awards.split(',').map(item => item.trim()) : [],
+                    biography: veteran.biography,
+                    militaryUnit: veteran.militaryUnit,
+                    battles: veteran.battles ? veteran.battles.split(',').map(item => item.trim()) : [],
+                    imageUrl: veteran.imageUrl || undefined,
+                }));
+
+                setVeterans(transformedVeterans);
+                setFilteredVeterans(transformedVeterans);
+            } catch (err) {
+                setError('Произошла ошибка при загрузке данных');
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchVeterans();
     }, []);
 
     // Фильтрация и поиск
@@ -50,7 +69,7 @@ export const VeteransPage = () => {
             result = result.filter(veteran => 
                 veteran.firstName.toLowerCase().includes(query) ||
                 veteran.lastName.toLowerCase().includes(query) ||
-                veteran.middleName?.toLowerCase().includes(query)
+                (veteran.middleName && veteran.middleName.toLowerCase().includes(query))
             );
         }
 
@@ -87,6 +106,35 @@ export const VeteransPage = () => {
     const totalPages = Math.ceil(filteredVeterans.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const paginatedVeterans = filteredVeterans.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col bg-gray-50">
+                <Header />
+                <main className="flex-grow flex items-center justify-center">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                        <p className="mt-4 text-gray-600">Загрузка данных...</p>
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen flex flex-col bg-gray-50">
+                <Header />
+                <main className="flex-grow flex items-center justify-center">
+                    <div className="text-center">
+                        <p className="text-red-600 text-lg">{error}</p>
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
@@ -131,4 +179,4 @@ export const VeteransPage = () => {
             <Footer />
         </div>
     );
-}; 
+};

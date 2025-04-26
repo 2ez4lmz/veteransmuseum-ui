@@ -3,7 +3,8 @@ import { useParams } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { NewsDetails } from '../components/news/NewsDetails';
-import { News } from '../types/news';
+import { News, NewsResponse } from '../types/news';
+import { fetchNewsById } from '../api/api';
 
 export const NewsDetailsPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -12,19 +13,24 @@ export const NewsDetailsPage = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchNews = async () => {
+        const getNewsDetails = async () => {
+            if (!id) return;
+            
             try {
                 setLoading(true);
-                // В будущем заменить на реальный API-запрос
-                const mockNews: News = {
-                    id: Number(id),
-                    title: 'Открытие нового зала музея',
-                    content: 'Сегодня состоялось торжественное открытие нового зала, посвященного ветеранам Великой Отечественной войны. В мероприятии приняли участие представители администрации города, ветераны и их родственники.\n\nНовый зал включает в себя уникальные экспонаты, фотографии и документы военных лет. Посетители могут увидеть личные вещи ветеранов, награды, письма с фронта и многое другое.\n\nЭкспозиция разделена на несколько тематических секций, каждая из которых рассказывает о разных аспектах военной жизни и подвигах наших ветеранов. Интерактивные стенды позволяют более подробно познакомиться с историями участников войны.',
-                    publishDate: '2024-04-01',
-                    author: 'Администрация музея',
-                    imageUrl: undefined
+                const data: NewsResponse = await fetchNewsById(id);
+                
+                // Преобразуем данные в формат News
+                const transformedNews: News = {
+                    id: data.id,
+                    title: data.title,
+                    content: data.content,
+                    imageUrl: data.imageUrl || undefined,
+                    publishDate: data.createdAt,
+                    author: `Автор ID: ${data.createdBy}` // В реальном приложении здесь нужно получать имя автора
                 };
-                setNews(mockNews);
+                
+                setNews(transformedNews);
             } catch (err) {
                 setError('Произошла ошибка при загрузке новости');
                 console.error(err);
@@ -33,7 +39,7 @@ export const NewsDetailsPage = () => {
             }
         };
 
-        fetchNews();
+        getNewsDetails();
     }, [id]);
 
     if (loading) {
@@ -90,4 +96,4 @@ export const NewsDetailsPage = () => {
             <Footer />
         </div>
     );
-}; 
+};

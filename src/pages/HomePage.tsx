@@ -5,31 +5,16 @@ import { NewsCard } from '../components/news/NewsCard';
 import { VeteranCard } from '../components/veterans/VeteranCard';
 import { Link } from 'react-router-dom';
 import { Veteran, VeteranResponse } from '../types/veteran';
-
-// Временные данные для демонстрации
-const mockNews = [
-    {
-        id: 1,
-        title: 'Открытие нового зала музея',
-        content: 'Сегодня состоялось торжественное открытие нового зала, посвященного ветеранам Великой Отечественной войны...',
-        publishDate: '2024-04-01',
-        author: 'Администрация музея',
-        imageUrl: undefined
-    },
-    {
-        id: 2,
-        title: 'Встреча с ветеранами',
-        content: 'В музее прошла традиционная встреча с ветеранами, на которой они поделились своими воспоминаниями...',
-        publishDate: '2024-03-15',
-        author: 'Пресс-служба',
-        imageUrl: undefined
-    }
-];
+import { News, NewsResponse } from '../types/news';
+import { fetchAllNews } from '../api/api';
 
 export const HomePage = () => {
     const [veterans, setVeterans] = useState<Veteran[]>([]);
+    const [news, setNews] = useState<News[]>([]);
     const [loading, setLoading] = useState(true);
+    const [newsLoading, setNewsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [newsError, setNewsError] = useState<string | null>(null);
 
     // Получение данных ветеранов с API
     useEffect(() => {
@@ -69,6 +54,60 @@ export const HomePage = () => {
         };
 
         fetchVeterans();
+    }, []);
+
+    // Получение всех новостей и выбор последних
+    useEffect(() => {
+        const getNews = async () => {
+            try {
+                setNewsLoading(true);
+                const data: NewsResponse[] = await fetchAllNews();
+                
+                // Преобразуем данные в формат News
+                const transformedNews: News[] = data.map(item => ({
+                    id: item.id,
+                    title: item.title,
+                    content: item.content,
+                    imageUrl: item.imageUrl || undefined,
+                    publishDate: item.createdAt,
+                    author: `Автор ID: ${item.createdBy}` // В реальном приложении здесь можно получать имя автора
+                }));
+                
+                // Сортируем по дате (от новых к старым) и берем последние 5
+                const sortedNews = transformedNews.sort((a, b) => 
+                    new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+                ).slice(0, 5);
+                
+                setNews(sortedNews);
+            } catch (err) {
+                setNewsError('Ошибка при загрузке новостей');
+                console.error(err);
+                
+                // Резервные данные на случай ошибки
+                setNews([
+                    {
+                        id: '1',
+                        title: 'Открытие нового зала музея',
+                        content: 'Сегодня состоялось торжественное открытие нового зала, посвященного ветеранам Великой Отечественной войны...',
+                        publishDate: '2024-04-01',
+                        author: 'Администрация музея',
+                        imageUrl: undefined
+                    },
+                    {
+                        id: '2',
+                        title: 'Встреча с ветеранами',
+                        content: 'В музее прошла традиционная встреча с ветеранами, на которой они поделились своими воспоминаниями...',
+                        publishDate: '2024-03-15',
+                        author: 'Пресс-служба',
+                        imageUrl: undefined
+                    }
+                ]);
+            } finally {
+                setNewsLoading(false);
+            }
+        };
+
+        getNews();
     }, []);
 
     return (
@@ -161,11 +200,21 @@ export const HomePage = () => {
                                 </svg>
                             </Link>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 md:gap-8">
-                            {mockNews.map(news => (
-                                <NewsCard key={news.id} news={news} />
-                            ))}
-                        </div>
+                        {newsLoading ? (
+                            <div className="flex justify-center py-12">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                            </div>
+                        ) : newsError ? (
+                            <div className="text-center py-8 text-red-600">
+                                {newsError}
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 md:gap-8">
+                                {news.map(item => (
+                                    <NewsCard key={item.id} news={item} />
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </section>
             </main>

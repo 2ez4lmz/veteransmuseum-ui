@@ -5,6 +5,7 @@ import { VeteranTable } from '../../components/admin/veterans/VeteranTable';
 import { VeteranFilters } from '../../components/admin/veterans/VeteranFilters';
 import { Pagination } from '../../components/common/Pagination';
 import { Veteran } from '../../types/veteran';
+import { fetchAllVeterans, deleteVeteran } from '../../api/api';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -27,57 +28,15 @@ export const VeteransAdminPage: React.FC = () => {
         const fetchVeterans = async () => {
             try {
                 setIsLoading(true);
-                // В реальном проекте здесь будет API-запрос
-                // Моковые данные
-                const mockVeterans: Veteran[] = [
-                    {
-                        id: 1,
-                        firstName: 'Иван',
-                        lastName: 'Иванов',
-                        middleName: 'Иванович',
-                        birthDate: '1920-05-15',
-                        deathDate: '2005-03-20',
-                        rank: 'Полковник',
-                        awards: ['Орден Красной Звезды', 'Медаль "За отвагу"'],
-                        biography: 'Участник Великой Отечественной войны, прошел путь от рядового до полковника...',
-                        militaryUnit: '123-я стрелковая дивизия',
-                        battles: ['Сталинградская битва', 'Курская битва'],
-                        imageUrl: undefined
-                    },
-                    {
-                        id: 2,
-                        firstName: 'Петр',
-                        lastName: 'Петров',
-                        middleName: 'Петрович',
-                        birthDate: '1918-10-23',
-                        deathDate: '1998-11-05',
-                        rank: 'Майор',
-                        awards: ['Орден Красного Знамени', 'Медаль "За оборону Москвы"'],
-                        biography: 'Воевал на Западном фронте, участвовал в обороне Москвы...',
-                        militaryUnit: '45-й стрелковый полк',
-                        battles: ['Битва за Москву', 'Ржевская битва'],
-                        imageUrl: undefined
-                    },
-                    {
-                        id: 3,
-                        firstName: 'Алексей',
-                        lastName: 'Смирнов',
-                        middleName: 'Николаевич',
-                        birthDate: '1922-02-10',
-                        deathDate: '2010-07-15',
-                        rank: 'Лейтенант',
-                        awards: ['Орден Отечественной войны II степени'],
-                        biography: 'Командовал взводом разведки, участвовал в боях на Курской дуге...',
-                        militaryUnit: '123-я стрелковая дивизия',
-                        battles: ['Курская битва', 'Битва за Днепр'],
-                        imageUrl: undefined
-                    }
-                ];
-                
-                setVeterans(mockVeterans);
-                setFilteredVeterans(mockVeterans);
+                const data = await fetchAllVeterans();
+                setVeterans(data);
+                setFilteredVeterans(data);
             } catch (error) {
                 console.error('Ошибка при загрузке ветеранов:', error);
+                setStatusMessage({
+                    type: 'error',
+                    text: 'Ошибка при загрузке списка ветеранов'
+                });
             } finally {
                 setIsLoading(false);
             }
@@ -115,9 +74,10 @@ export const VeteransAdminPage: React.FC = () => {
     }, [veterans, searchQuery, rankFilter, unitFilter]);
     
     // Удаление ветерана
-    const handleDeleteVeteran = (id: number) => {
+    const handleDeleteVeteran = async (id: number) => {
         try {
-            // В реальном проекте здесь будет API-запрос на удаление
+            await deleteVeteran(id);
+            
             const updatedVeterans = veterans.filter(vet => vet.id !== id);
             setVeterans(updatedVeterans);
             
@@ -131,6 +91,7 @@ export const VeteransAdminPage: React.FC = () => {
                 setStatusMessage(null);
             }, 3000);
         } catch (error) {
+            console.error('Ошибка при удалении ветерана:', error);
             setStatusMessage({
                 type: 'error',
                 text: 'Ошибка при удалении ветерана'
@@ -217,4 +178,4 @@ export const VeteransAdminPage: React.FC = () => {
             )}
         </AdminLayout>
     );
-}; 
+};

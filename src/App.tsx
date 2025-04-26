@@ -6,6 +6,8 @@ import { NewsPage } from './pages/NewsPage';
 import { NewsDetailsPage } from './pages/NewsDetailsPage';
 import { DashboardPage } from './pages/admin/DashboardPage';
 import { VeteransAdminPage } from './pages/admin/VeteransAdminPage';
+import { AddVeteranPage } from './pages/admin/AddVeteranPage';
+import { EditVeteranPage } from './pages/admin/EditVeteranPage';
 
 function App() {
     return (
@@ -20,8 +22,8 @@ function App() {
                 {/* Маршруты для админ панели */}
                 <Route path="/admin/dashboard" element={<DashboardPage />} />
                 <Route path="/admin/veterans" element={<VeteransAdminPage />} />
-                <Route path="/admin/veterans/add" element={<div>Страница добавления ветерана</div>} />
-                <Route path="/admin/veterans/edit/:id" element={<div>Страница редактирования ветерана</div>} />
+                <Route path="/admin/veterans/add" element={<AddVeteranPage />} />
+                <Route path="/admin/veterans/edit/:id" element={<EditVeteranPage />} />
                 
                 {/* Здесь будут другие маршруты */}
             </Routes>

@@ -24,11 +24,11 @@ export const VeteranDetails: FC<VeteranDetailsProps> = ({ veteran }) => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6">
                 {/* Фото и основная информация */}
                 <div className="space-y-6">
-                    <div className="relative w-full h-96 rounded-lg overflow-hidden">
+                    <div className="relative w-full h-96 rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
                         <img
                             src={veteran.imageUrl || '/default-avatar.webp'}
                             alt={`${veteran.lastName} ${veteran.firstName}`}
-                            className="w-full h-full object-cover"
+                            className="max-w-full max-h-full object-contain"
                         />
                     </div>
                     
@@ -116,4 +116,4 @@ export const VeteranDetails: FC<VeteranDetailsProps> = ({ veteran }) => {
             </div>
         </div>
     );
-}; 
+};

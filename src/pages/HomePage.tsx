@@ -119,7 +119,7 @@ export const HomePage = () => {
                     <div className="w-[60%] mx-auto px-8">
                         <div className="max-w-3xl mx-auto text-center">
                             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 md:mb-8">
-                                Добро пожаловать в Музей Ветеранов
+                                Добро пожаловать в музей ветеранов Башкортостана
                             </h1>
                             <p className="text-lg md:text-xl text-gray-300 mb-8 md:mb-12">
                                 Мы храним память о героях Великой Отечественной войны и их подвигах.
